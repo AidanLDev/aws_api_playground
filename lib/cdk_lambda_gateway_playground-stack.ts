@@ -1,16 +1,24 @@
-import * as cdk from 'aws-cdk-lib';
-import { Construct } from 'constructs';
-// import * as sqs from 'aws-cdk-lib/aws-sqs';
+import * as cdk from "aws-cdk-lib";
+import * as apigateway from "aws-cdk-lib/aws-apigateway";
+import { Construct } from "constructs";
+import * as lambda from "aws-cdk-lib/aws-lambda";
+import * as path from "path";
 
 export class CdkLambdaGatewayPlaygroundStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    // The code that defines your stack goes here
+    const helloFunction = new lambda.Function(this, "HelloHandler", {
+      runtime: lambda.Runtime.NODEJS_LATEST,
+      handler: "hello.handler",
+      code: lambda.Code.fromAsset(path.join(__dirname, "../lambda")),
+    });
 
-    // example resource
-    // const queue = new sqs.Queue(this, 'CdkLambdaGatewayPlaygroundQueue', {
-    //   visibilityTimeout: cdk.Duration.seconds(300)
-    // });
+    const api = new apigateway.RestApi(this, "aws_api_playground", {
+      restApiName: "aws_api_playground",
+      description: "An AWS API built with apigateway and Lambda",
+    });
+
+    api.root.addMethod("GET", new apigateway.LambdaIntegration(helloFunction));
   }
 }
