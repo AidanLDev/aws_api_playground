@@ -1,4 +1,4 @@
-import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
+import { NodejsFunction, OutputFormat } from "aws-cdk-lib/aws-lambda-nodejs";
 import * as cdk from "aws-cdk-lib";
 import * as apigateway from "aws-cdk-lib/aws-apigateway";
 import { Construct } from "constructs";
@@ -11,7 +11,7 @@ export class CdkLambdaGatewayPlaygroundStack extends cdk.Stack {
     super(scope, id, props);
 
     const helloFunction = new NodejsFunction(this, "HelloHandler", {
-      runtime: lambda.Runtime.NODEJS_LATEST,
+      runtime: lambda.Runtime.NODEJS_22_X,
       handler: "hello.handler",
       code: lambda.Code.fromAsset(path.join(__dirname, "../lambda")),
     });
@@ -31,15 +31,31 @@ export class CdkLambdaGatewayPlaygroundStack extends cdk.Stack {
     });
 
     const getUsersLambda = new NodejsFunction(this, "GetUsersFunction", {
-      runtime: lambda.Runtime.NODEJS_LATEST,
-      handler: "get-users.handler",
-      code: lambda.Code.fromAsset("lambda"),
+      entry: "lambda/get-users.ts",
+      runtime: lambda.Runtime.NODEJS_22_X,
+      handler: "handler",
       environment: {
         USERS_TABLE_NAME: usersTable.tableName,
+      },
+      bundling: {
+        format: OutputFormat.CJS,
+      },
+    });
+
+    const postUserLambda = new NodejsFunction(this, "PostUserFunction", {
+      entry: "lambda/post-user.ts",
+      runtime: lambda.Runtime.NODEJS_22_X,
+      handler: "handler",
+      environment: {
+        USERS_TABLE_NAME: usersTable.tableName,
+      },
+      bundling: {
+        format: OutputFormat.CJS,
       },
     });
 
     api.root.addMethod("GET", new apigateway.LambdaIntegration(helloFunction));
     users.addMethod("GET", new apigateway.LambdaIntegration(getUsersLambda));
+    users.addMethod("POST", new apigateway.LambdaIntegration(postUserLambda));
   }
 }
