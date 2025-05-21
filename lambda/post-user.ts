@@ -6,13 +6,13 @@ const dynamo = new DynamoDB.DocumentClient();
 const tableName = process.env.USERS_TABLE_NAME!;
 
 export const handler = async (
-  event: APIGatewayProxyEvent,
+  event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
-  console.log("event: ", event);
   try {
-    const body = JSON.parse(event.body || "{}");
+    const body = JSON.parse(event.body ?? "{}");
     const { email, number } = body;
     if (!email && !number) {
+      console.log("No email or number provided...");
       return {
         statusCode: 400,
         body: JSON.stringify({ message: JSON.stringify("") }),
@@ -43,6 +43,7 @@ export const handler = async (
         }),
       };
     }
+    console.log("User created in dynamo, going to return 200 now");
     return {
       statusCode: 200,
       body: JSON.stringify({ message: "Created a new user", newUser }),

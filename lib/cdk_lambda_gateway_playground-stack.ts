@@ -54,8 +54,16 @@ export class CdkLambdaGatewayPlaygroundStack extends cdk.Stack {
       },
     });
 
+    usersTable.grantWriteData(postUserLambda);
+    usersTable.grantReadData(getUsersLambda);
+
     api.root.addMethod("GET", new apigateway.LambdaIntegration(helloFunction));
     users.addMethod("GET", new apigateway.LambdaIntegration(getUsersLambda));
-    users.addMethod("POST", new apigateway.LambdaIntegration(postUserLambda));
+    users.addMethod(
+      "POST",
+      new apigateway.LambdaIntegration(postUserLambda, {
+        proxy: true,
+      })
+    );
   }
 }
