@@ -26,7 +26,7 @@ export class CdkLambdaGatewayPlaygroundStack extends cdk.Stack {
     const usersTable = new dynamo.Table(this, "Users_Playground", {
       partitionKey: { name: "id", type: dynamo.AttributeType.STRING },
       billingMode: dynamo.BillingMode.PAY_PER_REQUEST,
-      tableName: "MyAwesomeTable",
+      tableName: "Users",
       removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
 
