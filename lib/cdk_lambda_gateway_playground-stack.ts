@@ -9,7 +9,6 @@ import * as sqs from "aws-cdk-lib/aws-sqs";
 import * as iam from "aws-cdk-lib/aws-iam";
 import * as lambdaEventSources from "aws-cdk-lib/aws-lambda-event-sources";
 import * as sns from "aws-cdk-lib/aws-sns";
-import * as ses from "aws-cdk-lib/aws-ses";
 
 const VERIFIED_EMAIL = "dev@aidanlowson.com";
 
