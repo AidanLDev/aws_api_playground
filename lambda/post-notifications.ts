@@ -69,10 +69,11 @@ export const handler = async (
     return { statusCode: 500, body: "Failed to enqueue message" };
   }
 
+  console.log("Notification message sent to the queue successfully");
   return {
     statusCode: 200,
     body: JSON.stringify({
-      message: "Hello from Lambda!",
+      message: "Sent notification to the queue",
       path: event.path,
     }),
   };
