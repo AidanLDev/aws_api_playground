@@ -1,12 +1,12 @@
 import { DynamoDB } from "aws-sdk";
 import { SES } from "aws-sdk";
+import { SNS } from "aws-sdk";
 import { v4 as uuidv4 } from "uuid";
 
 const ses = new SES();
-const sesEmailIdentity =
-  process.env.SES_EMAIL_IDENTITY ?? "dev@aidanlowson.com";
-
 const dynamo = new DynamoDB.DocumentClient();
+const sns = new SNS();
+
 const notificationsTableName = process.env.NOTIFICATIONS_TABLE_NAME!;
 const updateNotificationsTable = async (userId: string, type: string) => {
   const newNotification = {
@@ -66,9 +66,18 @@ export const handler = async (event: any) => {
           throw new Error("Failed to send email");
         }
       } else if (body.type === "sms") {
-        /*
-          SNS_TOPIC_ARN
-        */
+        console.log("Sending SMS to ", body.number);
+        try {
+          await sns
+            .publish({
+              PhoneNumber: body.number,
+              Message: body.message,
+            })
+            .promise();
+        } catch (err) {
+          console.error("Failed to send SMS: ", err);
+          throw new Error("Failed to send SMS");
+        }
       }
     }
   }

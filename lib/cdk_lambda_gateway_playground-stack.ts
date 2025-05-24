@@ -47,7 +47,9 @@ export class CdkLambdaGatewayPlaygroundStack extends cdk.Stack {
       displayName: "Notification SNS Topic",
     });
 
-    const notificationEmailIdentityArn = `arn:aws:ses:${cdk.Stack.of(this).region}:${cdk.Stack.of(this).account}:identity/${VERIFIED_EMAIL}`;
+    const notificationEmailIdentityArn = `arn:aws:ses:${
+      cdk.Stack.of(this).region
+    }:${cdk.Stack.of(this).account}:identity/${VERIFIED_EMAIL}`;
 
     /** Define Lambda's */
     const helloFunction = new NodejsFunction(this, "HelloHandler", {
@@ -117,7 +119,6 @@ export class CdkLambdaGatewayPlaygroundStack extends cdk.Stack {
     // Grant publish to SNS topic
     notificationSnsTopic.grantPublish(notificationWorkerLambda);
 
-
     const users = api.root.addResource("users");
     const notifications = api.root.addResource("notifications");
 
@@ -140,6 +141,12 @@ export class CdkLambdaGatewayPlaygroundStack extends cdk.Stack {
 
     notificationWorkerLambda.addEventSource(
       new lambdaEventSources.SqsEventSource(notificationQueue)
+    );
+    notificationWorkerLambda.addToRolePolicy(
+      new iam.PolicyStatement({
+        actions: ["sns:Publish"],
+        resources: ["*"],
+      })
     );
     notificationQueue.grantSendMessages(postNotificationLambda);
     notificationQueue.grantConsumeMessages(notificationWorkerLambda);
