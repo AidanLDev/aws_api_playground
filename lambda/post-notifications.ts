@@ -29,19 +29,6 @@ async function enqueueSms(userId: string, message: string, number: string) {
   await sqsClient.send(new SendMessageCommand(params));
 }
 
-async function enqueuePush(userId: string, message: string, number: string) {
-  const params = {
-    QueueUrl: process.env.NOTIFICATIONS_QUEUE_URL,
-    MessageBody: JSON.stringify({
-      type: "push",
-      userId,
-      message,
-      number,
-    }),
-  };
-  await sqsClient.send(new SendMessageCommand(params));
-}
-
 export const handler = async (
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
@@ -60,9 +47,6 @@ export const handler = async (
     } else if (type === "sms") {
       console.log("Sending SMS message to the queue for: ", body.number);
       await enqueueSms(userId, message, body.number);
-    } else if (type === "push") {
-      console.log("Sending push message to the queue for: ", body.number);
-      await enqueuePush(userId, message, body.number);
     }
   } catch (err) {
     console.error("Failed to enqueue message: ", err);

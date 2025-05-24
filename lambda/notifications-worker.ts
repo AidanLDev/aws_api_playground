@@ -17,8 +17,6 @@ const updateNotificationsTable = async (userId: string, type: string) => {
   };
 
   try {
-    console.log("About to add new notification to DynamoDB: ", newNotification);
-    console.log("Talbe name: ", notificationsTableName);
     await dynamo
       .put({
         TableName: notificationsTableName,
